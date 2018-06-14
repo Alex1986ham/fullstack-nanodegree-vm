@@ -32,7 +32,7 @@ def login():
     if form.validaton_on_submit():
         flash('Login requested for user {}, remember_me={}.format(
             form.username.data, form.remember_me.data))
-        return redirect('/catalog')
+        return redirect(url_for('login'))
     return render_template('login.html', title='Login', form=form)
 
 @app.route('/catalog/<int:id>')
