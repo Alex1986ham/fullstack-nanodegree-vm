@@ -2,6 +2,7 @@ from flask import Flask
 from flask import render_template, flash, redirect
 import os
 from forms import LoginForm
+basedir = os.path.abspath(os.path.dirname(__file__))
 
 
 app = Flask(__name__)
@@ -43,6 +44,9 @@ def category(id):
 
 class Config(object):
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'you-will-nerver-guess'
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or /
+        'sqlite:///' + os.path.join(basedir, 'app.db')
+    SQLALCHEMY_TRACK_MODIFICATIONS = Flase
 
 
 
