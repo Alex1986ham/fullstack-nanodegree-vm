@@ -2,11 +2,19 @@ from flask import Flask
 from flask import render_template, flash, redirect
 import os
 from forms import LoginForm
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
+import db
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 
 app = Flask(__name__)
+#app.config.from_object(Config)
 app.config['SECRET_KEY'] = 'you-will-never-guess'
+db = SQLAlchemy(app)
+migrate = Migrate(app, db)
+
+# from app import routes, models
 
 
 
@@ -30,10 +38,10 @@ def catalog():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
-    if form.validaton_on_submit():
-        flash('Login requested for user {}, remember_me={}.format(
+    if form.validate_on_submit():
+        flash('Login requested for user {}, remember_me={}'.format(
             form.username.data, form.remember_me.data))
-        return redirect(url_for('login'))
+        return redirect(url_for('catalog'))
     return render_template('login.html', title='Login', form=form)
 
 @app.route('/catalog/<int:id>')
@@ -44,12 +52,18 @@ def category(id):
 
 class Config(object):
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'you-will-nerver-guess'
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or /
-        'sqlite:///' + os.path.join(basedir, 'app.db')
-    SQLALCHEMY_TRACK_MODIFICATIONS = Flase
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///' + os.path.join(basedir, 'app.db')
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(64), index=True, unique=True)
+    email = db.Column(db.String(120), index=True, unique=True)
+    password_hash = db.Column(db.String(128))
 
+    def __repr__(self):
+        return '<User {}>'.format(self.username)
 
 
 if __name__ == '__main__':
